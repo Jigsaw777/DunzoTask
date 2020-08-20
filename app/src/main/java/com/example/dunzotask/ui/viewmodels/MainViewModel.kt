@@ -1,17 +1,13 @@
 package com.example.dunzotask.ui.viewmodels
 
-import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.dunzotask.domain.requests.GetSearchItemsRequest
 import com.example.dunzotask.domain.usecases.GetImageSearchResultsUseCase
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-class MainViewModel @ViewModelInject constructor(private val getImageSearchResultsUseCase: GetImageSearchResultsUseCase,
-                                                 @Assisted private val savedStateHandle: SavedStateHandle
-) :
+class MainViewModel @ViewModelInject constructor(private val getImageSearchResultsUseCase: GetImageSearchResultsUseCase) :
     ViewModel() {
 
     val number = MutableLiveData<Long>()
