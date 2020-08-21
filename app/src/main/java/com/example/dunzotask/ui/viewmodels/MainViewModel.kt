@@ -1,5 +1,6 @@
 package com.example.dunzotask.ui.viewmodels
 
+import android.annotation.SuppressLint
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +10,7 @@ import com.example.dunzotask.domain.entities.PhotoEntity
 import com.example.dunzotask.domain.entities.PhotoListEntity
 import com.example.dunzotask.domain.requests.GetSearchItemsRequest
 import com.example.dunzotask.domain.usecases.GetImageSearchResultsUseCase
+import com.example.dunzotask.utils.NetworkUtils
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
@@ -35,27 +37,34 @@ class MainViewModel @ViewModelInject constructor(private val getImageSearchResul
     var savedList = mutableListOf<PhotoEntity>()
     var isNetworkFetched = false
 
+    @SuppressLint("CheckResult")
     fun getSearchResults(shouldIncrementPageNumber: Boolean = false) {
-        if (pageNumber <= totalPages) {
-            if (shouldIncrementPageNumber)
-                pageNumber += 1
-            isNetworkFetched = true
-            val request = GetSearchItemsRequest(pageNumber, searchTerm)
-            getImageSearchResultsUseCase.getSearcheResuts(request)
-                .subscribeOn(
-                    Schedulers.io()
-                ).subscribe({
-                    resultsLD.postValue(it.photoListEntity)
-                    totalPages =
-                        if (it.photoListEntity.photos.isNotEmpty()) it.photoListEntity.pages else 99999L
-                }, {
-                    it.printStackTrace()
-                    errorLD.postValue(it.localizedMessage)
-                }).let {
-                    compositeDisposable.add(it)
-                }
-        } else
-            errorLD.postValue(AppConstants.VM_ERROR_MSG)
+       NetworkUtils.hasInternetConnection().subscribe { hasInternet ->
+           if (hasInternet) {
+               if (pageNumber <= totalPages) {
+                   if (shouldIncrementPageNumber)
+                       pageNumber += 1
+                   isNetworkFetched = true
+                   val request = GetSearchItemsRequest(pageNumber, searchTerm)
+                   getImageSearchResultsUseCase.getSearcheResuts(request)
+                       .subscribeOn(
+                           Schedulers.io()
+                       ).subscribe({
+                           resultsLD.postValue(it.photoListEntity)
+                           totalPages =
+                               if (it.photoListEntity.photos.isNotEmpty()) it.photoListEntity.pages else 99999L
+                       }, {
+                           it.printStackTrace()
+                           errorLD.postValue(it.localizedMessage)
+                       }).let {
+                           compositeDisposable.add(it)
+                       }
+               } else
+                   errorLD.postValue(AppConstants.VM_ERROR_MSG)
+           } else {
+               errorLD.postValue(AppConstants.NO_NETWORK_ERROR)
+           }
+       }
     }
 
     override fun onCleared() {

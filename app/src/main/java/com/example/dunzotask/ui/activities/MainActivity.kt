@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
             hideLoader()
             rv_search_items.visibility = View.GONE
             tv_hint_text_search_result.visibility = View.VISIBLE
-            tv_hint_text_search_result.text = resources.getString(R.string.app_name)
+            tv_hint_text_search_result.text = it
         })
 
         mainViewModel.searchItemsResult.observe(this, Observer {
