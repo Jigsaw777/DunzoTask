@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">DunzoTask</string>
+    <string name="search_hint">Enter your text here to search</string>
+    <string name="search_result_hint">Your search results will come here</string>
+    <string name="error_result">Some error occurred. Please try again later.</string>
+    <string name="empty_search_term">Please enter something</string>
+    <string name="no_results_text">No results found. Please try again</string>
 </resources>

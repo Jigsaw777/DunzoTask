@@ -7,5 +7,5 @@ data class PhotoListEntity(
     @SerializedName("pages") val pages: Long,
     @SerializedName("perpage") val perPage: Int,
     @SerializedName("total") val total: String,
-    @SerializedName("photo") val photos: List<PhotoListEntity>
+    @SerializedName("photo") val photos: List<PhotoEntity>
 )

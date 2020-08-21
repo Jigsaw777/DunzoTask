@@ -17,6 +17,12 @@ class MainViewModel @ViewModelInject constructor(private val getImageSearchResul
     private var pageNumber = 1;
     private val compositeDisposable = CompositeDisposable()
     private val errorLD = MutableLiveData<String>()
+    private var totalPages: Long = 999999L
+
+    var isScrolling: Boolean = false
+    var searchTerm: String = ""
+
+    var rvLastPosition = 4
 
     val searchItemsResult: LiveData<PhotoListEntity>
         get() = resultsLD
@@ -24,20 +30,24 @@ class MainViewModel @ViewModelInject constructor(private val getImageSearchResul
     val errorLiveData: LiveData<String>
         get() = errorLD
 
-    fun getSearchResults(searchTerm: String) {
-        val request = GetSearchItemsRequest(pageNumber, searchTerm)
-        getImageSearchResultsUseCase.getSearcheResuts(request)
-            .subscribeOn(
-                Schedulers.io()
-            ).subscribe({
-                resultsLD.postValue(it.photoListEntity)
-                pageNumber=it.photoListEntity.page
-            }, {
-                it.printStackTrace()
-                errorLD.postValue(it.localizedMessage)
-            }).let {
-                compositeDisposable.add(it)
-            }
+    fun getSearchResults(shouldIncrementPageNumber: Boolean = false) {
+        if (pageNumber <= totalPages) {
+            if (shouldIncrementPageNumber)
+                pageNumber += 1
+            val request = GetSearchItemsRequest(pageNumber, searchTerm)
+            getImageSearchResultsUseCase.getSearcheResuts(request)
+                .subscribeOn(
+                    Schedulers.io()
+                ).subscribe({
+                    resultsLD.postValue(it.photoListEntity)
+                    totalPages = it.photoListEntity.pages
+                }, {
+                    it.printStackTrace()
+                    errorLD.postValue(it.localizedMessage)
+                }).let {
+                    compositeDisposable.add(it)
+                }
+        }
     }
 
     override fun onCleared() {
