@@ -10,7 +10,7 @@ class GetSearchItemsRequest(private val pageNumber: Int = 1, private val searchT
         params["format"] = "json"
         params["api_key"] = "062a6c0c49e4de1d78497d13a7dbb360"
         params["method"] = "flickr.photos.search"
-        params["per_page"] = "4"
+        params["per_page"] = "8"
         return params;
     }
 }

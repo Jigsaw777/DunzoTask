@@ -70,8 +70,6 @@ class MainActivity : AppCompatActivity() {
     private fun observeEvents() {
         btn_search.setOnClickListener {
             hideKeyboard()
-            adapter.clear()
-            mainViewModel.savedList.clear()
             val searchTerm = et_search.text.toString()
             if (searchTerm.trim().isEmpty()) {
                 Toast.makeText(
@@ -80,6 +78,8 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
+                adapter.clear()
+                mainViewModel.savedList.clear()
                 mainViewModel.searchTerm = searchTerm
                 mainViewModel.getSearchResults()
                 showLoader()

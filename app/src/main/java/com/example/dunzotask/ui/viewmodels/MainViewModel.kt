@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.dunzotask.data.constants.AppConstants
 import com.example.dunzotask.domain.entities.PhotoEntity
 import com.example.dunzotask.domain.entities.PhotoListEntity
 import com.example.dunzotask.domain.requests.GetSearchItemsRequest
@@ -15,7 +16,7 @@ class MainViewModel @ViewModelInject constructor(private val getImageSearchResul
     ViewModel() {
 
     private val resultsLD = MutableLiveData<PhotoListEntity>()
-    private var pageNumber = 1;
+    private var pageNumber = 1
     private val compositeDisposable = CompositeDisposable()
     private val errorLD = MutableLiveData<String>()
     private var totalPages: Long = 999999L
@@ -38,21 +39,23 @@ class MainViewModel @ViewModelInject constructor(private val getImageSearchResul
         if (pageNumber <= totalPages) {
             if (shouldIncrementPageNumber)
                 pageNumber += 1
+            isNetworkFetched = true
             val request = GetSearchItemsRequest(pageNumber, searchTerm)
             getImageSearchResultsUseCase.getSearcheResuts(request)
                 .subscribeOn(
                     Schedulers.io()
                 ).subscribe({
-                    isNetworkFetched = true
                     resultsLD.postValue(it.photoListEntity)
-                    totalPages = it.photoListEntity.pages
+                    totalPages =
+                        if (it.photoListEntity.photos.isNotEmpty()) it.photoListEntity.pages else 99999L
                 }, {
                     it.printStackTrace()
                     errorLD.postValue(it.localizedMessage)
                 }).let {
                     compositeDisposable.add(it)
                 }
-        }
+        } else
+            errorLD.postValue(AppConstants.VM_ERROR_MSG)
     }
 
     override fun onCleared() {
