@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.dunzotask.domain.entities.PhotoEntity
 import com.example.dunzotask.domain.entities.PhotoListEntity
 import com.example.dunzotask.domain.requests.GetSearchItemsRequest
 import com.example.dunzotask.domain.usecases.GetImageSearchResultsUseCase
@@ -30,6 +31,9 @@ class MainViewModel @ViewModelInject constructor(private val getImageSearchResul
     val errorLiveData: LiveData<String>
         get() = errorLD
 
+    var savedList = mutableListOf<PhotoEntity>()
+    var isNetworkFetched = false
+
     fun getSearchResults(shouldIncrementPageNumber: Boolean = false) {
         if (pageNumber <= totalPages) {
             if (shouldIncrementPageNumber)
@@ -39,6 +43,7 @@ class MainViewModel @ViewModelInject constructor(private val getImageSearchResul
                 .subscribeOn(
                     Schedulers.io()
                 ).subscribe({
+                    isNetworkFetched = true
                     resultsLD.postValue(it.photoListEntity)
                     totalPages = it.photoListEntity.pages
                 }, {

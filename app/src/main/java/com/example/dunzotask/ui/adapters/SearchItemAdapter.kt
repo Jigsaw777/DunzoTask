@@ -21,6 +21,10 @@ class SearchItemAdapter() : RecyclerView.Adapter<SearchItemVH>() {
         return searchItems.isEmpty()
     }
 
+    fun getPhotosList():MutableList<PhotoEntity>{
+        return searchItems
+    }
+
     fun clear() {
         searchItems.clear()
         notifyDataSetChanged()

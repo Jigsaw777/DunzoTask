@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dunzotask.R
-import com.example.dunzotask.data.constants.AppConstants
 import com.example.dunzotask.domain.entities.PhotoEntity
 import com.example.dunzotask.ui.adapters.SearchItemAdapter
 import com.example.dunzotask.ui.viewmodels.MainViewModel
@@ -61,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         btn_search.setOnClickListener {
             hideKeyboard()
             adapter.clear()
+            mainViewModel.savedList.clear()
             val searchTerm = et_search.text.toString()
             if (searchTerm.trim().isEmpty()) {
                 Toast.makeText(
@@ -84,13 +84,19 @@ class MainActivity : AppCompatActivity() {
         })
 
         mainViewModel.searchItemsResult.observe(this, Observer {
-            if (it.photos.isEmpty() && adapter.isEmpty()) {
-                tv_hint_text_search_result.text = resources.getString(R.string.no_results_text)
-                tv_hint_text_search_result.visibility = View.VISIBLE
-            } else if (it.photos.isNotEmpty()) {
-                setDataInRecyclerView(it.photos)
+            if (mainViewModel.savedList.isNotEmpty() && !mainViewModel.isNetworkFetched) {
+                setDataInRecyclerView(mainViewModel.savedList)
                 rv_search_items.visibility = View.VISIBLE
                 tv_hint_text_search_result.visibility = View.GONE
+            } else {
+                if (it.photos.isEmpty() && adapter.isEmpty()) {
+                    tv_hint_text_search_result.text = resources.getString(R.string.no_results_text)
+                    tv_hint_text_search_result.visibility = View.VISIBLE
+                } else if (it.photos.isNotEmpty()) {
+                    setDataInRecyclerView(it.photos)
+                    rv_search_items.visibility = View.VISIBLE
+                    tv_hint_text_search_result.visibility = View.GONE
+                }
             }
             hideLoader()
             hideLoader(true)
@@ -124,8 +130,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        mainViewModel.rvLastPosition = layoutManager.itemCount / 4
-        outState.putInt(AppConstants.LIST_POSITION, mainViewModel.rvLastPosition)
+        mainViewModel.rvLastPosition = layoutManager.findFirstVisibleItemPosition()
+        mainViewModel.savedList = adapter.getPhotosList()
+        mainViewModel.isNetworkFetched = false
         super.onSaveInstanceState(outState)
     }
 
