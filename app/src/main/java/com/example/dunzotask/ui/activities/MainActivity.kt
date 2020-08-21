@@ -36,23 +36,34 @@ class MainActivity : AppCompatActivity() {
 
     private fun initialiseVariables() {
         adapter = SearchItemAdapter()
-        layoutManager = GridLayoutManager(this, DisplayUtils.calculateNumberOfColumns(this))
+        layoutManager = GridLayoutManager(
+            this,
+            DisplayUtils.calculateNumberOfColumns(this),
+            if (DisplayUtils.isLandscape(this)) GridLayoutManager.HORIZONTAL else GridLayoutManager.VERTICAL,
+            false
+        )
         rv_search_items.layoutManager = layoutManager
         rv_search_items.itemAnimator = DefaultItemAnimator()
         rv_search_items.adapter = adapter
     }
 
     private fun showLoader(isPaginationProgress: Boolean = false) {
-        if (isPaginationProgress)
-            pb_pagination.visibility = View.VISIBLE
-        else
+        if (isPaginationProgress) {
+            if (DisplayUtils.isLandscape(this))
+                pb_pagination_landscape.visibility = View.VISIBLE
+            else
+                pb_pagination_portrait.visibility = View.VISIBLE
+        } else
             pb_main.visibility = View.VISIBLE
     }
 
     private fun hideLoader(isPaginationProgress: Boolean = false) {
-        if (isPaginationProgress)
-            pb_pagination.visibility = View.GONE
-        else
+        if (isPaginationProgress) {
+            if (DisplayUtils.isLandscape(this))
+                pb_pagination_landscape.visibility = View.GONE
+            else
+                pb_pagination_portrait.visibility = View.GONE
+        } else
             pb_main.visibility = View.GONE
     }
 
@@ -121,9 +132,17 @@ class MainActivity : AppCompatActivity() {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(1)) {
-                    mainViewModel.isScrolling = true
-                    showLoader((true))
+                if(DisplayUtils.isLandscape(this@MainActivity)) {
+                    if(!recyclerView.canScrollHorizontally(1)){
+                        mainViewModel.isScrolling=true
+                        showLoader(true)
+                    }
+                }
+                else{
+                    if (!recyclerView.canScrollVertically(1)) {
+                        mainViewModel.isScrolling = true
+                        showLoader(true)
+                    }
                 }
             }
         })
