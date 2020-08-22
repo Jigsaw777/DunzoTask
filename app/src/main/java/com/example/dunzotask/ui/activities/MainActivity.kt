@@ -7,6 +7,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,7 +27,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: SearchItemAdapter
     private lateinit var layoutManager: GridLayoutManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -70,12 +70,7 @@ class MainActivity : AppCompatActivity() {
     private fun observeEvents() {
 
         btn_history.setOnClickListener {
-            fragment_container.visibility = View.VISIBLE
-            val historyFragment = SearchHistoryFragment.newInstance()
-            supportFragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
-                .add(R.id.fragment_container, historyFragment)
-                .addToBackStack(null).commitAllowingStateLoss()
+            openHistoryFragment()
         }
 
         btn_search.setOnClickListener {
@@ -170,12 +165,34 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.rvLastPosition = layoutManager.findFirstVisibleItemPosition()
         mainViewModel.cachedListForConfigurationChange = adapter.getPhotosList()
         mainViewModel.isNetworkFetched = false
+        mainViewModel.isFragmentVisible = fragment_container.isVisible
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         rv_search_items.scrollToPosition(mainViewModel.rvLastPosition)
+        if (mainViewModel.isFragmentVisible) {
+            openHistoryFragment()
+        }
+    }
+
+    private fun openHistoryFragment() {
+        fragment_container.visibility = View.VISIBLE
+        val frag = supportFragmentManager.findFragmentById(R.id.fragment_container)
+        if (frag == null) {
+            val historyFragment = SearchHistoryFragment.newInstance()
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.fade_in,
+                    R.anim.fade_out,
+                    R.anim.fade_in,
+                    R.anim.fade_out
+                )
+                .add(R.id.fragment_container, historyFragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     private fun hideKeyboard() {

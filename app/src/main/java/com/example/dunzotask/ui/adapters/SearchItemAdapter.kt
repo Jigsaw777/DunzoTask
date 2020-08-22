@@ -7,7 +7,7 @@ import com.example.dunzotask.R
 import com.example.dunzotask.domain.entities.networkEntities.PhotoEntity
 import com.example.dunzotask.ui.viewholders.SearchItemVH
 
-class SearchItemAdapter() : RecyclerView.Adapter<SearchItemVH>() {
+class SearchItemAdapter : RecyclerView.Adapter<SearchItemVH>() {
 
     private var searchItems = mutableListOf<PhotoEntity>()
 

@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dunzotask.data.constants.AppConstants
-import com.example.dunzotask.domain.entities.dbEntities.PhotoDbEntity
 import com.example.dunzotask.domain.entities.dbEntities.SearchHistoryEntity
 import com.example.dunzotask.domain.entities.networkEntities.PhotoEntity
 import com.example.dunzotask.domain.entities.networkEntities.PhotoListEntity
@@ -15,7 +14,6 @@ import com.example.dunzotask.domain.requests.GetSearchItemsRequest
 import com.example.dunzotask.domain.usecases.AddSearchHistoryItemUseCase
 import com.example.dunzotask.domain.usecases.GetImageSearchResultsUseCase
 import com.example.dunzotask.utils.NetworkUtils
-import com.example.dunzotask.utils.ObjectBox
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
@@ -46,6 +44,7 @@ class MainViewModel @ViewModelInject constructor(
     var isNetworkFetched = false
     var historyPicturesList = mutableListOf<PhotoEntity>()
     var timeOfSearch = ""
+    var isFragmentVisible=false
 
     @SuppressLint("CheckResult")
     fun getSearchResults(shouldIncrementPageNumber: Boolean = false) {
@@ -90,41 +89,31 @@ class MainViewModel @ViewModelInject constructor(
     fun saveDataToLocal() {
         /** this would be executed as soon as activity gets killed. Making a variable and then saving it takes time
          * hence saved it directly. */
-        addSearchHistoryItemUseCase.addSearchItem(SearchHistoryEntity(
-            photos = getDBEntity(historyPicturesList),
-            searchTerm = searchTerm,
-            time = timeOfSearch
-        ))
+        addSearchHistoryItemUseCase.addSearchItem(
+            SearchHistoryEntity(
+                browsedItems = historyPicturesList.size.toLong(),
+                searchTerm = searchTerm,
+                time = timeOfSearch
+            )
+        )
+        Log.d("vm","total : ${historyPicturesList.size}")
         historyPicturesList.clear()
     }
 
     override fun onCleared() {
-        if (historyPicturesList.isNotEmpty() && searchTerm.isNotEmpty())
-            saveDataToLocal()
+        if (historyPicturesList.isNotEmpty() && searchTerm.isNotEmpty()) {
+            addSearchHistoryItemUseCase.addSearchItem(
+                SearchHistoryEntity(
+                    browsedItems = historyPicturesList.size.toLong(),
+                    searchTerm = searchTerm,
+                    time = timeOfSearch
+                )
+            )
+            Log.d("vm","total : ${historyPicturesList.size}")
+            historyPicturesList.clear()
+        }
         compositeDisposable.dispose()
         compositeDisposable.clear()
         super.onCleared()
-    }
-
-    /** Alternatively can create a generic mapper interface and specify an implementation for this class.
-     * This is naive way of converting an entity to a different type */
-    private fun getDBEntity(photos: List<PhotoEntity>): List<PhotoDbEntity> {
-        val ret = mutableListOf<PhotoDbEntity>()
-        photos.forEach {
-            ret.add(
-                PhotoDbEntity(
-                    id = it.id,
-                    owner = it.owner,
-                    secret = it.secret,
-                    server = it.server,
-                    farm = it.farm,
-                    title = it.title,
-                    isPublic = it.isPublic,
-                    isFamily = it.isFamily,
-                    isFriend = it.isFriend
-                )
-            )
-        }
-        return ret
     }
 }

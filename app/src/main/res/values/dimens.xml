@@ -35,4 +35,7 @@
     <!-- orientation adjustments dimensions -->
     <dimen name="guidelines_margin_ends">0dp</dimen>
 
+    <item name="start_guide" format="float" type="integer">0.0</item>
+    <item name="end_guide" format="float" type="integer">1.0</item>
+
 </resources>

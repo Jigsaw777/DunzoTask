@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "2:4244095536076224920",
-      "lastPropertyId": "4:1062675057599521837",
+      "lastPropertyId": "5:1182074060700913858",
       "name": "SearchHistoryEntity",
       "properties": [
         {
@@ -23,15 +23,15 @@
           "name": "idSearchHistory",
           "type": 6,
           "flags": 1
+        },
+        {
+          "id": "5:1182074060700913858",
+          "name": "browsedItems",
+          "type": 6,
+          "flags": 4
         }
       ],
-      "relations": [
-        {
-          "id": "1:4653476326199366212",
-          "name": "photos",
-          "targetId": "3:5687346282109317772"
-        }
-      ]
+      "relations": []
     },
     {
       "id": "3:5687346282109317772",
@@ -119,6 +119,8 @@
     2968065494374554424,
     438549956729397453
   ],
-  "retiredRelationUids": [],
+  "retiredRelationUids": [
+    4653476326199366212
+  ],
   "version": 1
 }

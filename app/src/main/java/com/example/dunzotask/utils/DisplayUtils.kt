@@ -20,7 +20,7 @@ object DisplayUtils {
 
     fun getCurrentTime():String{
         val date=Calendar.getInstance().time
-        val formatter=SimpleDateFormat("MMM d h:mm a", Locale.getDefault())
+        val formatter=SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
         return formatter.format(date)
     }
 }

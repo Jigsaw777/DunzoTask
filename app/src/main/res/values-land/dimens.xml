@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="guidelines_margin_ends">60dp</dimen>
+
+    <item name="start_guide" format="float" type="integer">0.2</item>
+    <item name="end_guide" format="float" type="integer">0.8</item>
 </resources>

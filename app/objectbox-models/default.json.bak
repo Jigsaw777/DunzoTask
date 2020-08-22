@@ -22,7 +22,7 @@
           "id": "4:1062675057599521837",
           "name": "idSearchHistory",
           "type": 6,
-          "flags": 129
+          "flags": 1
         }
       ],
       "relations": [
@@ -42,7 +42,7 @@
           "id": "1:1695567293193222174",
           "name": "idPhoto",
           "type": 6,
-          "flags": 129
+          "flags": 1
         },
         {
           "id": "2:2473653977824394625",

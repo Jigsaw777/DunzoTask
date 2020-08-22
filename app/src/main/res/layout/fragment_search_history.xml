@@ -15,20 +15,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/guidelines_margin_ends" />
+        app:layout_constraintGuide_percent="@integer/end_guide"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/guidelines_margin_ends" />
+        app:layout_constraintGuide_percent="@integer/start_guide"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_search_history"
-        android:layout_width="@dimen/spacing_0"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        app:layout_constraintStart_toEndOf="@+id/gl_start"
-        app:layout_constraintEnd_toStartOf="@+id/gl_end"/>
+        app:layout_constraintStart_toStartOf="@+id/gl_start"
+        app:layout_constraintEnd_toEndOf="@+id/gl_end"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
