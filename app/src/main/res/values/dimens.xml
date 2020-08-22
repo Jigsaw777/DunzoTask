@@ -2,6 +2,8 @@
 <resources>
     <!-- spacings -->
     <dimen name="spacing_0">0dp</dimen>
+    <dimen name="spacing_2">2dp</dimen>
+    <dimen name="spacing_3">3dp</dimen>
     <dimen name="spacing_4">4dp</dimen>
     <dimen name="spacing_8">8dp</dimen>
     <dimen name="spacing_12">12dp</dimen>
@@ -18,6 +20,8 @@
 
 
     <!-- text sizes -->
+    <dimen name="size_12">12sp</dimen>
+    <dimen name="size_14">14sp</dimen>
     <dimen name="size_16">16sp</dimen>
     <dimen name="size_17">17sp</dimen>
     <dimen name="size_18">18sp</dimen>
@@ -27,4 +31,8 @@
     <dimen name="size_26">26sp</dimen>
     <dimen name="size_28">28sp</dimen>
     <dimen name="size_36">36sp</dimen>
+
+    <!-- orientation adjustments dimensions -->
+    <dimen name="guidelines_margin_ends">0dp</dimen>
+
 </resources>

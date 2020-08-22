@@ -7,13 +7,13 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dunzotask.R
-import com.example.dunzotask.domain.entities.PhotoEntity
+import com.example.dunzotask.domain.entities.networkEntities.PhotoEntity
 import com.example.dunzotask.ui.adapters.SearchItemAdapter
+import com.example.dunzotask.ui.fragments.SearchHistoryFragment
 import com.example.dunzotask.ui.viewmodels.MainViewModel
 import com.example.dunzotask.utils.DisplayUtils
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,9 +68,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeEvents() {
+
+        btn_history.setOnClickListener {
+            fragment_container.visibility = View.VISIBLE
+            val historyFragment = SearchHistoryFragment.newInstance()
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
+                .add(R.id.fragment_container, historyFragment)
+                .addToBackStack(null).commitAllowingStateLoss()
+        }
+
         btn_search.setOnClickListener {
             hideKeyboard()
             val searchTerm = et_search.text.toString()
+
             if (searchTerm.trim().isEmpty()) {
                 Toast.makeText(
                     this,
@@ -78,8 +89,14 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
+                mainViewModel.resetPageNumber()
+                if (mainViewModel.historyPicturesList.isNotEmpty()) {
+                    //save asynchronously
+                    Thread { mainViewModel.saveDataToLocal() }.start()
+                }
+                mainViewModel.timeOfSearch = DisplayUtils.getCurrentTime()
                 adapter.clear()
-                mainViewModel.savedList.clear()
+                mainViewModel.cachedListForConfigurationChange.clear()
                 mainViewModel.searchTerm = searchTerm
                 mainViewModel.getSearchResults()
                 showLoader()
@@ -87,16 +104,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        mainViewModel.errorLiveData.observe(this, Observer {
+        mainViewModel.errorLiveData.observe(this, {
             hideLoader()
             rv_search_items.visibility = View.GONE
             tv_hint_text_search_result.visibility = View.VISIBLE
             tv_hint_text_search_result.text = it
         })
 
-        mainViewModel.searchItemsResult.observe(this, Observer {
-            if (mainViewModel.savedList.isNotEmpty() && !mainViewModel.isNetworkFetched) {
-                setDataInRecyclerView(mainViewModel.savedList)
+        mainViewModel.searchItemsResult.observe(this, {
+            if (mainViewModel.cachedListForConfigurationChange.isNotEmpty() && !mainViewModel.isNetworkFetched) {
+                setDataInRecyclerView(mainViewModel.cachedListForConfigurationChange)
                 rv_search_items.visibility = View.VISIBLE
                 tv_hint_text_search_result.visibility = View.GONE
             } else {
@@ -112,6 +129,7 @@ class MainActivity : AppCompatActivity() {
             hideLoader()
             hideLoader(true)
         })
+
     }
 
     private fun setDataInRecyclerView(items: List<PhotoEntity>) {
@@ -150,7 +168,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         mainViewModel.rvLastPosition = layoutManager.findFirstVisibleItemPosition()
-        mainViewModel.savedList = adapter.getPhotosList()
+        mainViewModel.cachedListForConfigurationChange = adapter.getPhotosList()
         mainViewModel.isNetworkFetched = false
         super.onSaveInstanceState(outState)
     }

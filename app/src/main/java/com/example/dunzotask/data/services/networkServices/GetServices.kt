@@ -1,7 +1,7 @@
-package com.example.dunzotask.data.services
+package com.example.dunzotask.data.services.networkServices
 
 import com.example.dunzotask.data.constants.AppConstants
-import com.example.dunzotask.domain.entities.PhotoResponseEntity
+import com.example.dunzotask.domain.entities.networkEntities.PhotoResponseEntity
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
 import retrofit2.http.QueryMap

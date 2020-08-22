@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dunzotask.R
-import com.example.dunzotask.domain.entities.PhotoEntity
+import com.example.dunzotask.domain.entities.networkEntities.PhotoEntity
 import com.example.dunzotask.ui.viewholders.SearchItemVH
 
 class SearchItemAdapter() : RecyclerView.Adapter<SearchItemVH>() {

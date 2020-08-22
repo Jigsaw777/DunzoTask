@@ -4,7 +4,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dunzotask.R
-import com.example.dunzotask.domain.entities.PhotoEntity
+import com.example.dunzotask.domain.entities.networkEntities.PhotoEntity
 import kotlinx.android.synthetic.main.search_item_view_layout.view.*
 
 class SearchItemVH(private val view: View) : RecyclerView.ViewHolder(view) {

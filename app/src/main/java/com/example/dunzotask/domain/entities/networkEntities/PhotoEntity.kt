@@ -1,4 +1,4 @@
-package com.example.dunzotask.domain.entities
+package com.example.dunzotask.domain.entities.networkEntities
 
 import com.google.gson.annotations.SerializedName
 

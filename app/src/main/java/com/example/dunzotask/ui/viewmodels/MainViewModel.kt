@@ -1,20 +1,28 @@
 package com.example.dunzotask.ui.viewmodels
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dunzotask.data.constants.AppConstants
-import com.example.dunzotask.domain.entities.PhotoEntity
-import com.example.dunzotask.domain.entities.PhotoListEntity
+import com.example.dunzotask.domain.entities.dbEntities.PhotoDbEntity
+import com.example.dunzotask.domain.entities.dbEntities.SearchHistoryEntity
+import com.example.dunzotask.domain.entities.networkEntities.PhotoEntity
+import com.example.dunzotask.domain.entities.networkEntities.PhotoListEntity
 import com.example.dunzotask.domain.requests.GetSearchItemsRequest
+import com.example.dunzotask.domain.usecases.AddSearchHistoryItemUseCase
 import com.example.dunzotask.domain.usecases.GetImageSearchResultsUseCase
 import com.example.dunzotask.utils.NetworkUtils
+import com.example.dunzotask.utils.ObjectBox
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-class MainViewModel @ViewModelInject constructor(private val getImageSearchResultsUseCase: GetImageSearchResultsUseCase) :
+class MainViewModel @ViewModelInject constructor(
+    private val getImageSearchResultsUseCase: GetImageSearchResultsUseCase,
+    private val addSearchHistoryItemUseCase: AddSearchHistoryItemUseCase
+) :
     ViewModel() {
 
     private val resultsLD = MutableLiveData<PhotoListEntity>()
@@ -34,42 +42,89 @@ class MainViewModel @ViewModelInject constructor(private val getImageSearchResul
     val errorLiveData: LiveData<String>
         get() = errorLD
 
-    var savedList = mutableListOf<PhotoEntity>()
+    var cachedListForConfigurationChange = mutableListOf<PhotoEntity>()
     var isNetworkFetched = false
+    var historyPicturesList = mutableListOf<PhotoEntity>()
+    var timeOfSearch = ""
 
     @SuppressLint("CheckResult")
     fun getSearchResults(shouldIncrementPageNumber: Boolean = false) {
-       NetworkUtils.hasInternetConnection().subscribe { hasInternet ->
-           if (hasInternet) {
-               if (pageNumber <= totalPages) {
-                   if (shouldIncrementPageNumber)
-                       pageNumber += 1
-                   isNetworkFetched = true
-                   val request = GetSearchItemsRequest(pageNumber, searchTerm)
-                   getImageSearchResultsUseCase.getSearcheResuts(request)
-                       .subscribeOn(
-                           Schedulers.io()
-                       ).subscribe({
-                           resultsLD.postValue(it.photoListEntity)
-                           totalPages =
-                               if (it.photoListEntity.photos.isNotEmpty()) it.photoListEntity.pages else 99999L
-                       }, {
-                           it.printStackTrace()
-                           errorLD.postValue(it.localizedMessage)
-                       }).let {
-                           compositeDisposable.add(it)
-                       }
-               } else
-                   errorLD.postValue(AppConstants.VM_ERROR_MSG)
-           } else {
-               errorLD.postValue(AppConstants.NO_NETWORK_ERROR)
-           }
-       }
+        NetworkUtils.hasInternetConnection().subscribe { hasInternet ->
+            if (hasInternet) {
+                if (pageNumber <= totalPages) {
+                    if (shouldIncrementPageNumber)
+                        pageNumber += 1
+                    isNetworkFetched = true
+                    val request = GetSearchItemsRequest(pageNumber, searchTerm)
+                    getImageSearchResultsUseCase.getSearcheResuts(request)
+                        .subscribeOn(
+                            Schedulers.io()
+                        ).subscribe({
+                            resultsLD.postValue(it.photoListEntity)
+                            totalPages =
+                                if (it.photoListEntity.photos.isNotEmpty()) it.photoListEntity.pages else 99999L
+                            if (it.photoListEntity.photos.isNotEmpty()) {
+                                historyPicturesList.addAll(
+                                    pageNumber - 1,
+                                    it.photoListEntity.photos
+                                )
+                            }
+                        }, {
+                            it.printStackTrace()
+                            errorLD.postValue(it.localizedMessage)
+                        }).let {
+                            compositeDisposable.add(it)
+                        }
+                } else
+                    errorLD.postValue(AppConstants.VM_ERROR_MSG)
+            } else {
+                errorLD.postValue(AppConstants.NO_NETWORK_ERROR)
+            }
+        }
+    }
+
+    fun resetPageNumber() {
+        pageNumber = 1
+    }
+
+    fun saveDataToLocal() {
+        /** this would be executed as soon as activity gets killed. Making a variable and then saving it takes time
+         * hence saved it directly. */
+        addSearchHistoryItemUseCase.addSearchItem(SearchHistoryEntity(
+            photos = getDBEntity(historyPicturesList),
+            searchTerm = searchTerm,
+            time = timeOfSearch
+        ))
+        historyPicturesList.clear()
     }
 
     override fun onCleared() {
+        if (historyPicturesList.isNotEmpty() && searchTerm.isNotEmpty())
+            saveDataToLocal()
         compositeDisposable.dispose()
         compositeDisposable.clear()
         super.onCleared()
+    }
+
+    /** Alternatively can create a generic mapper interface and specify an implementation for this class.
+     * This is naive way of converting an entity to a different type */
+    private fun getDBEntity(photos: List<PhotoEntity>): List<PhotoDbEntity> {
+        val ret = mutableListOf<PhotoDbEntity>()
+        photos.forEach {
+            ret.add(
+                PhotoDbEntity(
+                    id = it.id,
+                    owner = it.owner,
+                    secret = it.secret,
+                    server = it.server,
+                    farm = it.farm,
+                    title = it.title,
+                    isPublic = it.isPublic,
+                    isFamily = it.isFamily,
+                    isFriend = it.isFriend
+                )
+            )
+        }
+        return ret
     }
 }

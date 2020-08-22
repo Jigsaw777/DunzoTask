@@ -2,8 +2,11 @@ package com.example.dunzotask.di
 
 import com.example.dunzotask.data.constants.AppConstants
 import com.example.dunzotask.data.implementation.RepoImpl
-import com.example.dunzotask.data.services.GetServices
+import com.example.dunzotask.data.services.localServices.GetFromLocalDBServices
+import com.example.dunzotask.data.services.localServices.PostToLocalDBServices
+import com.example.dunzotask.data.services.networkServices.GetServices
 import com.example.dunzotask.domain.repo.Repository
+import com.example.dunzotask.domain.usecases.AddSearchHistoryItemUseCase
 import com.example.dunzotask.domain.usecases.GetImageSearchResultsUseCase
 import dagger.Module
 import dagger.Provides
@@ -23,6 +26,11 @@ object MethodModules {
     @Provides
     fun provideSearchResultsUseCase(repository: Repository): GetImageSearchResultsUseCase {
         return GetImageSearchResultsUseCase(repository)
+    }
+
+    @Provides
+    fun addSearchHistoryItemUseCase(repository: Repository): AddSearchHistoryItemUseCase{
+        return AddSearchHistoryItemUseCase(repository)
     }
 
     @Provides
@@ -49,7 +57,23 @@ object MethodModules {
 
     @Provides
     @Singleton
-    fun getRepoImpl(service: GetServices): RepoImpl {
-        return RepoImpl(service)
+    fun getFromLocalDBServices():GetFromLocalDBServices{
+        return GetFromLocalDBServices()
+    }
+
+    @Provides
+    @Singleton
+    fun postToLocalDbServices():PostToLocalDBServices{
+        return PostToLocalDBServices()
+    }
+
+    @Provides
+    @Singleton
+    fun getRepoImpl(
+        service: GetServices,
+        getFromLocalService: GetFromLocalDBServices,
+        postToLocalService: PostToLocalDBServices
+    ): RepoImpl {
+        return RepoImpl(service, getFromLocalService, postToLocalService)
     }
 }

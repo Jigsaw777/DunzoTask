@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="@dimen/spacing_8"
     android:layout_margin="@dimen/spacing_8"
-    android:background="@drawable/shadow_bg">
+    android:background="@drawable/coloured_rounded_bg">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="@dimen/spacing_150"

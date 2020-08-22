@@ -2,7 +2,10 @@ package com.example.dunzotask.utils
 
 import android.content.Context
 import android.content.res.Configuration
+import android.util.Log
 import com.example.dunzotask.R
+import java.text.SimpleDateFormat
+import java.util.*
 
 object DisplayUtils {
     fun calculateNumberOfColumns(context: Context): Int {
@@ -13,5 +16,11 @@ object DisplayUtils {
 
     fun isLandscape(context: Context): Boolean {
         return context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    }
+
+    fun getCurrentTime():String{
+        val date=Calendar.getInstance().time
+        val formatter=SimpleDateFormat("MMM d h:mm a", Locale.getDefault())
+        return formatter.format(date)
     }
 }
