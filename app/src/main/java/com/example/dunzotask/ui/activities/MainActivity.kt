@@ -86,8 +86,9 @@ class MainActivity : AppCompatActivity() {
             } else {
                 mainViewModel.resetPageNumber()
                 if (mainViewModel.historyPicturesList.isNotEmpty()) {
-                    //save asynchronously
-                    Thread { mainViewModel.saveDataToLocal() }.start()
+                    //this cannot be run asynchronously as the other thread will take the latest value of
+                    // search term and not the old value. Hence, saving the data in the main thread will use the older value first
+                    mainViewModel.saveDataToLocal()
                 }
                 mainViewModel.timeOfSearch = DisplayUtils.getCurrentTime()
                 adapter.clear()
