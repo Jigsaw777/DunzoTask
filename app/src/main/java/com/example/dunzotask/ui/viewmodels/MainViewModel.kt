@@ -101,6 +101,7 @@ class MainViewModel @ViewModelInject constructor(
     }
 
     override fun onCleared() {
+        // this is not guaranteed to save the data. It works 70% of the time (Tested).
         if (historyPicturesList.isNotEmpty() && searchTerm.isNotEmpty()) {
             addSearchHistoryItemUseCase.addSearchItem(
                 SearchHistoryEntity(
