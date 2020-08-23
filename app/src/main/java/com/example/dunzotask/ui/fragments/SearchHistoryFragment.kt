@@ -51,8 +51,11 @@ class SearchHistoryFragment : Fragment() {
         rv_search_history.adapter = adapter
         rv_search_history.itemAnimator = DefaultItemAnimator()
         rv_search_history.layoutManager = layoutManager
+
+        //fetch list only once and then cache it
         if (!searchViewModel.hasListBeenFetchedOnce)
             searchViewModel.getSearchList()
+        
     }
 
     private fun initListeners() {
