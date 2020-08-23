@@ -7,4 +7,5 @@
     <string name="no_results_text">No results found. Please try again</string>
     <string name="history_screen_title">You searched for :</string>
     <string name="browsed_through_text">You browsed through</string>
+    <string name="empty_search_items">You haven\'t searched for anything yet.\nPlease search and come here again</string>
 </resources>

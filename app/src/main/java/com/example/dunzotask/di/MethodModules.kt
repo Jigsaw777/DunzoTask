@@ -8,6 +8,7 @@ import com.example.dunzotask.data.services.networkServices.GetServices
 import com.example.dunzotask.domain.repo.Repository
 import com.example.dunzotask.domain.usecases.AddSearchHistoryItemUseCase
 import com.example.dunzotask.domain.usecases.GetImageSearchResultsUseCase
+import com.example.dunzotask.domain.usecases.GetSearchListFromLocalUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,8 +30,13 @@ object MethodModules {
     }
 
     @Provides
-    fun addSearchHistoryItemUseCase(repository: Repository): AddSearchHistoryItemUseCase{
+    fun addSearchHistoryItemUseCase(repository: Repository): AddSearchHistoryItemUseCase {
         return AddSearchHistoryItemUseCase(repository)
+    }
+
+    @Provides
+    fun getSearchListFromLocalUseCase(repository: Repository): GetSearchListFromLocalUseCase {
+        return GetSearchListFromLocalUseCase(repository)
     }
 
     @Provides
